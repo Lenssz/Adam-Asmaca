@@ -1,0 +1,3 @@
+PASS: all six stroke profiles; quarter-progress renders; tip/path alignment; duplicate prevention; disabled drawing physics; moving-parent following; completion handoff; original completed appearance; cancellation and silent reveal.
+Max drawing anchor gap: 0,0000000 units.
+Max completed RGB difference: 0/255.

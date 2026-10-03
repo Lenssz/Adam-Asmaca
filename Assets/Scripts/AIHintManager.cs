@@ -11,14 +11,10 @@ public class AIHintManager : MonoBehaviour
     public TMP_Text hintText;
 
     [Header("API Ayarları")]
-    [Tooltip("Google AI Studio'dan aldığınız API anahtarlarını buraya ekleyin.")]
-    public string[] apiKeys = new string[]
-    {
-        "AIzaSyCT4YXesAgVtq8b5yimIQ80i0Gz4xKGIcA",
-        "AIzaSyAB3DdZ2qv01y0IPQRUs2LN2gd-BDbz8dE",
-        "AIzaSyA-3ONQ2jOsTpBNSgU10fvwPjiyleZkEWY",
-        "AIzaSyArbuF_NB5BUkSVVeJ9i7wx5W7o-blG1_s"
-    };
+    private string[] apiKeys = System.Array.Empty<string>();
+
+    [System.Serializable]
+    private class LocalGeminiSettings { public string[] apiKeys = System.Array.Empty<string>(); }
 
 
     private string apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
@@ -28,6 +24,15 @@ public class AIHintManager : MonoBehaviour
 
     void Start()
     {
+        // This optional asset stays on the developer's machine and is ignored by Git.
+        var localSettings = Resources.Load<TextAsset>("LocalSecrets/GeminiSettings");
+        if (localSettings != null)
+        {
+            var settings = JsonUtility.FromJson<LocalGeminiSettings>(localSettings.text);
+            if (settings != null && settings.apiKeys != null)
+                apiKeys = System.Array.FindAll(settings.apiKeys, key => !string.IsNullOrWhiteSpace(key));
+        }
+
         // Oyun başladığında ipucu paneli kapalı olsun
         if (hintPanel != null)
         {

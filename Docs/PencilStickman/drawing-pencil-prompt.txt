@@ -1,0 +1,4 @@
+Use case: illustration-story. Asset type: transparent 2D game sprite, a small moving drawing pencil for a graphite stickman game on cream paper. Primary request: exactly ONE short sharpened graphite pencil, hand-drawn in rough black graphite with subtle gray hatch shading, tiny natural pale wood tip. Pencil points straight vertically DOWN, tip at bottom center, barrel above it. Entire pencil visible with ample transparent margins. Long narrow silhouette, about 5:1 height to width. Drawn with lively slightly irregular sketch outlines, matches a charming hand-drawn pencil stickman, readable when displayed small. Side view, flat 2D, no perspective. No hand, no paper, no letters, no brand, no drop shadow, no background, no extra marks. Genuinely transparent alpha outside pencil.
+
+Generated with the built-in image_gen tool, transparent background enabled.
+Project asset: Assets/Sprites/PencilStickman/drawing-pencil.png

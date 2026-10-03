@@ -6,6 +6,32 @@
 # See: https://github.com/github/gitignore/tree/main/Global
 #
 .utmp/
+# Local credentials and service configuration (never force-add these).
+/Assets/Resources/LocalSecrets/
+/Assets/Resources/LocalSecrets.meta
+/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset
+/Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
+/Assets/PlayFabSDK/Shared/Public/Resources/PlayFabSharedSettings.asset
+/Assets/PlayFabSDK/Shared/Public/Resources/PlayFabSharedSettings.asset.meta
+/Assets/PlayFabEditorExtensions/Editor/Resources/PlayFabEditorPrefsSO.asset
+/Assets/PlayFabEditorExtensions/Editor/Resources/PlayFabEditorPrefsSO.asset.meta
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+/secrets/
+/credentials/
+# Account validation output includes personal IDs and signed-in dashboard captures.
+/Docs/Accounts/*
+!/Docs/Accounts/README.md
+/Assets/Resources/PerformanceTestRunInfo.json*
+/Assets/Resources/PerformanceTestRunSettings.json*
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/

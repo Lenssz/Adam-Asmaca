@@ -1,0 +1,1 @@
+PASS: square opaque source imported without compression; Unity default application icon assigned. Device/package builds not tested.

@@ -1,0 +1,1 @@
+PASS: both actual game scenes in Play Mode; 32 keyboard keys; Patrick Hand on all game texts; correct/wrong key states; full six-part queue and silent completion; bounds retained across reset and resize; result panels; Turkish long word preview. Photon events and score timing were not altered. No live two-device multiplayer or physical mobile device test performed.

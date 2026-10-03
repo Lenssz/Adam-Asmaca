@@ -1,0 +1,1 @@
+enabled=True active=True culled=False vertices=36 rect=(x:-42.00, y:-19.00, width:84.00, height:38.00) world=(1.35, -3.76, -9.60) screen=(571.11, 193.26) color=RGBA(1.000, 1.000, 1.000, 1.000) rendererColor=RGBA(1.000, 1.000, 1.000, 1.000) canvas=Paper page transition overlay

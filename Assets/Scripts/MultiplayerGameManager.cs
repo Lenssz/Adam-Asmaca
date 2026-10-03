@@ -104,15 +104,15 @@ public class MultiplayerGameManager : MonoBehaviourPunCallbacks
             myNewBox.GetComponentInChildren<TMP_Text>().text = "";
             myNewBox.GetComponent<Image>().color = hiddenSlotColor;
             myBoxes.Add(myNewBox);
-            myNewBox.transform.localScale = Vector3.zero;
+            myNewBox.transform.localScale = PaperPageTransition.IsTransitioning ? Vector3.one : Vector3.zero;
             int idx = i;
-            DOVirtual.DelayedCall(idx * slotRevealDelay, () => myNewBox.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack));
+            if (!PaperPageTransition.IsTransitioning) DOVirtual.DelayedCall(idx * slotRevealDelay, () => myNewBox.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack).SetLink(myNewBox)).SetLink(myNewBox);
 
             GameObject opponentNewBox = Instantiate(opponentBoxPrefab, opponentWordContainer);
             opponentNewBox.GetComponent<Image>().color = hiddenSlotColor;
             opponentBoxes.Add(opponentNewBox);
-            opponentNewBox.transform.localScale = Vector3.zero;
-            DOVirtual.DelayedCall(idx * slotRevealDelay, () => opponentNewBox.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack));
+            opponentNewBox.transform.localScale = PaperPageTransition.IsTransitioning ? Vector3.one : Vector3.zero;
+            if (!PaperPageTransition.IsTransitioning) DOVirtual.DelayedCall(idx * slotRevealDelay, () => opponentNewBox.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack).SetLink(opponentNewBox)).SetLink(opponentNewBox);
         }
     }
 
@@ -180,14 +180,14 @@ public class MultiplayerGameManager : MonoBehaviourPunCallbacks
         if (winnerActorNumber == -1)
         {
 
-            resultMsg = "<color=#FFFF00>BERABERE!</color>\n<size=80%>İkiniz de asıldınız...</size>";
+            resultMsg = "<color=#716844>BERABERE!</color>\n<size=80%>İkiniz de asıldınız...</size>";
         }
         // 2. KAZANMA DURUMU (ActorNumber eşleşirse)
         else if (winnerActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
         {
             EconomyManager.AddCoin(2);
             int currentCoins = EconomyManager.GetCoins();
-            resultMsg = "<color=#00FF00><size=120%>TEBRİKLER, KAZANDIN!</size></color>\n<size=80%>Kazanılan Altın 2</size>\n<size=80%>Mevcut Altın: " + currentCoins + "</size>";
+            resultMsg = "<color=#456E42><size=120%>TEBRİKLER, KAZANDIN!</size></color>\n<size=80%>Kazanılan Altın 2</size>\n<size=80%>Mevcut Altın: " + currentCoins + "</size>";
         }
         // 3. KAYBETME DURUMU
         else
@@ -201,11 +201,11 @@ public class MultiplayerGameManager : MonoBehaviourPunCallbacks
             }
             EconomyManager.AddCoin(1);
             int currentCoins = EconomyManager.GetCoins();
-            resultMsg = "<color=#FF0000><size=120%>MAALESEF, KAYBETTİN!</size></color>\n<size=80%>Kazanan: " + winnerName + "</size>\n<size=80%>Kazanılan Altın 1</size>\n<size=80%>Mevcut Altın: " + currentCoins + "</size>";
+            resultMsg = "<color=#914A42><size=120%>MAALESEF, KAYBETTİN!</size></color>\n<size=80%>Kazanan: " + winnerName + "</size>\n<size=80%>Kazanılan Altın 1</size>\n<size=80%>Mevcut Altın: " + currentCoins + "</size>";
         }
 
         // SONUÇ VE DOĞRU KELİME
-        resultText.text = resultMsg + "\n\n<color=#FFD700>Doğru Kelime: " + secretWord + "</color>";
+        resultText.text = resultMsg + "\n\n<color=#716844>Doğru Kelime: " + secretWord + "</color>";
 
         // PANEL ANİMASYONU
         winLossPanel.transform.localScale = Vector3.zero;
@@ -216,6 +216,7 @@ public class MultiplayerGameManager : MonoBehaviourPunCallbacks
 
     public void OnRematchButtonClicked()
     {
+        if (PaperPageTransition.IsTransitioning) return;
         iWantRematch = true;
         rematchButton.interactable = false;
         rematchButtonText.text = "Rakip Bekleniyor...";
@@ -244,23 +245,39 @@ public class MultiplayerGameManager : MonoBehaviourPunCallbacks
 
     public void LeaveToMenu()
     {
-        PhotonNetwork.LeaveRoom();
+        if (PaperPageTransition.IsTransitioning) return;
+        if (!PhotonNetwork.InRoom) { PaperPageTransition.LoadScene("SampleScene"); return; }
+        PaperPageTransition.CoverNetworkLoad(() => { if (!PhotonNetwork.LeaveRoom()) UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("SampleScene"); });
     }
 
     public override void OnLeftRoom()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+        if (PaperPageTransition.IsTransitioning)
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("SampleScene");
+        else PaperPageTransition.LoadScene("SampleScene");
+    }
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        PaperPageTransition.Instance?.CancelNetworkWait();
+        PaperPageTransition.LoadScene("SampleScene");
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        if (!isGameOver && (FriendMatchService.Instance?.IsPlaying ?? false))
+        {
+            isGameOver = true; winLossPanel.SetActive(true); rematchButton.interactable = false;
+            resultText.text = "Arkadaşın odadan ayrıldı.\nMenüye dönülüyor…";
+            DOVirtual.DelayedCall(2f, () => LeaveToMenu()).SetLink(gameObject);
+            return;
+        }
         // Rakip oyundan çıkarsa rematch butonunu kapat ve bilgi ver
         if (isGameOver)
         {
             rematchButton.interactable = false;
             rematchButtonText.text = "Rakip Ayrıldı";
             resultText.text = "Rakip oyundan ayrıldı.\nMenüye dönülüyor...";
-            DOVirtual.DelayedCall(2f, () => LeaveToMenu());
+            DOVirtual.DelayedCall(2f, () => LeaveToMenu()).SetLink(gameObject);
         }
     }
 

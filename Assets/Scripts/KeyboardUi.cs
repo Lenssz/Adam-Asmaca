@@ -79,6 +79,7 @@ public class KeyboardUI : MonoBehaviour
 
     void OnKeyPressed(char letter)
     {
+        if (PaperPageTransition.IsTransitioning) return;
         // İŞTE KÖPRÜ BURASI!
         if (PhotonNetwork.InRoom)
         {
@@ -107,7 +108,6 @@ public class KeyboardUI : MonoBehaviour
         Color target = correct ? correctColor : wrongColor;
 
         img.DOColor(target, 0.25f);
-        btn.transform.DOPunchScale(Vector3.one * 0.2f, 0.25f, 5, 0.5f);
 
         btn.interactable = false;
     }

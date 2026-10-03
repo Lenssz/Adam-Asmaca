@@ -65,8 +65,9 @@ public class GameManager : MonoBehaviour
 
     public void SelectCategory(int index)
     {
+        if (PaperPageTransition.IsTransitioning) return;
         selectedCategoryIndex = index;
-        SceneManager.LoadScene("GAMESCENE");
+        PaperPageTransition.LoadScene("GAMESCENE");
     }
 
     public void StartGame()
@@ -191,7 +192,7 @@ public class GameManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("SampleScene");
+        PaperPageTransition.LoadScene("SampleScene");
     }
     public int CategoryIndex { get { return selectedCategoryIndex; } }
 }

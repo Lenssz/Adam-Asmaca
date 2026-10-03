@@ -1,0 +1,1 @@
+enabled=True active=True culled=False vertices=65 rect=(x:-65.25, y:-65.25, width:130.50, height:130.50) world=(1.37, -1.18, 10.00) screen=(573.13, 596.12) color=RGBA(1.000, 1.000, 1.000, 1.000) rendererColor=RGBA(1.000, 1.000, 1.000, 1.000) canvas=Canvas

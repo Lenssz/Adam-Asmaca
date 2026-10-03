@@ -16,13 +16,14 @@ public class WordDisplay : MonoBehaviour
     public float letterPlaceDuration = 0.25f;
     public Color correctLetterColor = new Color(0.2f, 0.9f, 0.4f);
     public Color hiddenSlotColor = new Color(0.15f, 0.15f, 0.25f);
+    public Color unrevealedLetterColor = new Color(.87f,.69f,.66f);
 
     private List<TMP_Text> letterTexts = new List<TMP_Text>();
     private List<Image> slotImages = new List<Image>();
     void Start()
     {
         // Sahne açıldığında halihazırda seçilmiş bir kelime varsa kutuları hemen çiz!
-        if (GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.CurrentWord))
+        if (letterTexts.Count == 0 && GameManager.Instance != null && !string.IsNullOrEmpty(GameManager.Instance.CurrentWord))
         {
             BuildWordDisplay();
         }
@@ -63,13 +64,16 @@ public class WordDisplay : MonoBehaviour
             letterTexts.Add(txt);
             slotImages.Add(img);
 
+            // Initial page entry already reveals every UI element together.
+            if (PaperPageTransition.IsTransitioning) { slot.transform.localScale = Vector3.one; continue; }
+
             // Animasyonlu açılış: scale 0 → 1, sırayla
             slot.transform.localScale = Vector3.zero;
             int idx = i;
             DOVirtual.DelayedCall(idx * slotRevealDelay, () =>
             {
-                slot.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack);
-            });
+                slot.transform.DOScale(1f, slotRevealDuration).SetEase(Ease.OutBack).SetLink(slot);
+            }).SetLink(slot);
         }
     }
 
@@ -90,7 +94,7 @@ public class WordDisplay : MonoBehaviour
                 txt.transform.localScale = Vector3.zero;
                 txt.text = letter.ToString();
 
-                Sequence seq = DOTween.Sequence();
+                Sequence seq = DOTween.Sequence().SetLink(txt.gameObject);
                 seq.Append(img.DOColor(correctLetterColor, 0.2f));
                 seq.Join(txt.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
                 seq.Append(txt.transform.DOPunchScale(Vector3.one * 0.3f, 0.2f));
@@ -107,7 +111,7 @@ public class WordDisplay : MonoBehaviour
             if (letterTexts[i].text == "")
             {
                 letterTexts[i].text = word[i].ToString();
-                slotImages[i].DOColor(new Color(0.9f, 0.3f, 0.3f), 0.3f);
+                slotImages[i].DOColor(unrevealedLetterColor, 0.3f);
                 letterTexts[i].transform.DOPunchScale(Vector3.one * 0.2f, 0.3f);
             }
         }

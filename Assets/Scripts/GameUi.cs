@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using System.Collections;
 
 public class GameUI : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class GameUI : MonoBehaviour
     [Header("Referanslar")]
     public HangmanDrawer hangmanDrawer;   // RawImage objesini sürükle
     public WordDisplay wordDisplay;
+    private Coroutine resultRoutine;
 
     void OnEnable()
     {
@@ -31,6 +33,7 @@ public class GameUI : MonoBehaviour
 
     void OnDisable()
     {
+        if (resultRoutine != null) { StopCoroutine(resultRoutine); resultRoutine = null; }
         if (GameManager.Instance == null) return;
         GameManager.Instance.OnGameEnd -= ShowResult;
     }
@@ -41,13 +44,13 @@ public class GameUI : MonoBehaviour
 
         playAgainButton.onClick.AddListener(() =>
         {
+            if (PaperPageTransition.IsTransitioning) return;
             resultPanel.SetActive(false);
             GameManager.Instance.LoadNewWord();
         });
 
         backMenuButton.onClick.AddListener(() =>
         {
-            resultPanel.SetActive(false);
             GameManager.Instance.GoToMainMenu();
         });
     }
@@ -64,7 +67,18 @@ public class GameUI : MonoBehaviour
             hangmanDrawer.PlayLoseEffect();
         }
 
-        DOVirtual.DelayedCall(0.8f, () =>
+        if (resultRoutine != null) StopCoroutine(resultRoutine);
+        resultRoutine = StartCoroutine(ShowResultAfterDrawing(won));
+    }
+
+    IEnumerator ShowResultAfterDrawing(bool won)
+    {
+        int revision = hangmanDrawer != null ? hangmanDrawer.DrawingRevision : 0;
+        string word = GameManager.Instance.CurrentWord;
+        // Keep the existing minimum delay, then let pending pencil strokes finish.
+        yield return new WaitForSeconds(0.8f);
+        if (hangmanDrawer != null) yield return hangmanDrawer.WaitForDrawing();
+        if (hangmanDrawer != null && revision != hangmanDrawer.DrawingRevision) { resultRoutine = null; yield break; }
         {
             resultPanel.SetActive(true);
             resultPanel.transform.localScale = Vector3.zero;
@@ -72,7 +86,7 @@ public class GameUI : MonoBehaviour
 
             resultTitle.text = won ? "Kazandın!" : "Kaybettin!";
             resultTitle.color = won ? winColor : loseColor;
-            resultWord.text = (won ? "" : "Kelime: ") + GameManager.Instance.CurrentWord;
+            resultWord.text = (won ? "" : "Kelime: ") + word;
             if (won)
             {
                 int currentCoin = EconomyManager.GetCoins();
@@ -83,6 +97,7 @@ public class GameUI : MonoBehaviour
                 int currentCoin = EconomyManager.GetCoins();
                 coinWord.text = "Mevcut Altın: " + currentCoin;
             }
-        });
+        }
+        resultRoutine = null;
     }
 }

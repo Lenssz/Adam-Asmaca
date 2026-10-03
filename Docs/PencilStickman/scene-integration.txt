@@ -1,0 +1,1 @@
+PASS: GAMESCENE and MultiplayerGameScene reference PencilRagdoll with rope anchors.

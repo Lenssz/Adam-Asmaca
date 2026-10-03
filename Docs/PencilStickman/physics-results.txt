@@ -1,0 +1,4 @@
+PASS: six independent bodies/sprites; hidden physics disabled; reveal stages 1-6; repeated/out-of-range reveal; moving-parent alignment; unit physics scales; constrained drag; 12 seconds of impulse/settling simulation; separated arm/leg resting pose.
+Max joint gap: 0,001621 units
+Max speed: 1,2568 units/s
+Final speed: 0,044517 units/s

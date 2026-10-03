@@ -1,0 +1,1 @@
+PASS: actual Play Mode coroutines; drawing sound playback; reset during head and limb; immediate audio cancellation; rapid 1-to-6 queue; duplicate/decreasing notifications; serial physics handoff; deferred loss shake and camera restoration; single AudioListener; result panel waits for drawing; stale result cancelled after reset.
